@@ -10,7 +10,40 @@ on:
     branches:
       - master
 
+
 jobs:
+  initialize-eslint-config:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.MY_PERSONAL_TOKEN }} # Use PAT for checkout
+        ref: ${{ github.head_ref }}
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14' # Adjust the Node.js version as needed
+
+    - name: Install ESLint and Prettier
+      run: |
+        npm install eslint prettier --save-dev
+
+    - name: Initialize ESLint Configuration
+      run: npx eslint --init --yes
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'GitHub Actions'
+        git config --global user.email 'your-email@example.com' # Replace with a valid email
+        git add .eslintrc.js # Add the ESLint configuration file
+        git commit -m "Initialize ESLint configuration"
+        git push origin HEAD:${{ github.head_ref }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_TOKEN }} # Use PAT for pushing changes
+
   lint-and-format:
     runs-on: ubuntu-latest
 
@@ -30,14 +63,11 @@ jobs:
       run: |
         npm install eslint prettier --save-dev
 
-    - name: Install dependencies
-      run: npm install
-
     - name: Lint with ESLint
       run: npx eslint .
 
     - name: Format code with Prettier
-      run: npx prettier --write .
+      run: npx prettier --check .
 
     - name: Commit and push changes
       run: |
