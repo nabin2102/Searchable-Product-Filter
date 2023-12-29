@@ -26,6 +26,10 @@ jobs:
       with:
         node-version: '14' # Adjust the Node.js version as needed
 
+    - name: Install ESLint and Prettier
+      run: |
+        npm install eslint prettier --save-dev
+
     - name: Install dependencies
       run: npm install
 
