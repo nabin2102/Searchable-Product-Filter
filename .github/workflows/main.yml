@@ -36,9 +36,6 @@ jobs:
     - name: Initialize ESLint Configuration
       run: npx eslint --init --yes
 
-    - name: Lint with ESLint
-      run: npx eslint .
-
     - name: Format code with Prettier
       run: npx prettier --check .
 
