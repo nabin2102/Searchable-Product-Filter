@@ -1,4 +1,4 @@
-name: Lint
+name: Lint and Format React App
 
 on:
   # Trigger the workflow on push or pull request,
@@ -11,25 +11,35 @@ on:
       - master
 
 jobs:
-  run-linters:
-    name: Run linters
+  lint-and-format:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v3
+    - name: Check out the repository
+      uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.MY_PERSONAL_TOKEN }} # Use PAT for checkout
+        ref: ${{ github.head_ref }}
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: 14
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14' # Adjust the Node.js version as needed
 
-      # ESLint and Prettier must be in `package.json`
-      - name: Install Node.js dependencies
-        run: npm ci
+    - name: Install dependencies
+      run: npm install
 
-      - name: Run linters
-        uses: wearerequired/lint-action@v2
-        with:
-          eslint: true
-          prettier: true
+    - name: Lint with ESLint
+      run: npx eslint .
+
+    - name: Format code with Prettier
+      run: npx prettier --write .
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'GitHub Actions'
+        git config --global user.email 'your-email@example.com' # Replace with a valid email
+        git commit -am "Format code with Prettier and lint with ESLint" || echo "No changes to commit"
+        git push origin HEAD:${{ github.head_ref }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_TOKEN }} # Use PAT for pushing changes
